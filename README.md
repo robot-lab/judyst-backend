@@ -5,6 +5,7 @@
 - apt-get install rabbitmq-server
 - apt-get install postgresql
 - pip install -r requirements.txt
+
 ## pre run
 - postgresql start
 - rabbitmq-server start
