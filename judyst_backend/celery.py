@@ -8,7 +8,7 @@ from kombu import Exchange, Queue
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'judyst_backend.settings')
 django.setup()
 
-app = Celery('Main', broker=settings.BROKER_URL, include=['core.tasks'])
+app = Celery('Main', broker=settings.BROKER_URL, include=['tasks.basic_task'])
 app.config_from_object('django.conf:settings', namespace='CELERY')
 queue_name = 'celery'
 app.conf.task_queues = [Queue(queue_name, Exchange(queue_name), routing_key=queue_name)]
