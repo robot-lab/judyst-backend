@@ -4,22 +4,7 @@ import celery
 from judyst_backend.celery import app
 
 
-def task_prerun(fn, prerun):
-    def wrapped(*args, **kwargs):
-        prerun(*args, **kwargs)
-        return fn(*args, **kwargs)
-
-    return wrapped
-
-
-class MetaBaseTask(type):
-    def __init__(cls, name, bases, attrs):
-        cls.name = name
-        cls.run = task_prerun(cls.run, getattr(cls, 'on_prerun'))
-        super().__init__(cls)
-
-
-class BaseTask(celery.Task, metaclass=MetaBaseTask):
+class BaseTask(celery.Task):
     serializer = settings.CELERY_TASK_SERIALIZER
     max_retries = 3
     ignore_result = True
@@ -32,7 +17,7 @@ class BaseTask(celery.Task, metaclass=MetaBaseTask):
         pass
 
     def run(self, *args, **kwargs):
-        return super().run(*args, **kwargs)
+        pass
 
     def on_success(self, retval, task_id, args, kwargs):
         pass
