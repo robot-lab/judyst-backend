@@ -4,7 +4,7 @@ addons:
 python:
   - "3.6"
 before_script:
-  - psql -c 'create database database;' -U postgres
+  - psql -c 'create judyst_backend database;' -U postgres
   - python3 manage.py makemigrations
   - python3 manage.py migrate
 # command to install dependencies
