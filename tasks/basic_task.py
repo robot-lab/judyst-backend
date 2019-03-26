@@ -43,4 +43,5 @@ app.tasks.register(BaseTask())
 
 @worker_ready.connect()
 def at_start(sender, **k):
+    # function that runs when node start
     pass

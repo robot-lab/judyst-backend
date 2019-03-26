@@ -7,8 +7,14 @@
 - pip install -r requirements.txt
 
 ## pre run
+Запуск внешнекй инфраструктуры
 - postgresql start
 - rabbitmq-server start
+
+Генерация настроек
+- python gen_settings.py
+
+Настройка базы данных
 - manage.py makemigrations
 - manage.py migrate
 - manage.py createsuperuser
