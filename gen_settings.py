@@ -32,4 +32,7 @@ BROKER_URL = "{get_var("BROKER_URL")}"
 # site settings
 BASE_URL = "{get_var("BASE_URL")}"
 ALLOWED_HOSTS = ['*']
+
+# security information
+SECRET_KEY = "{get_var("SECRET_KEY")}"
 """)
