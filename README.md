@@ -41,7 +41,7 @@
 ## pre run
 В этом разделе описываются действия необходимые для успешного запуска проекта.
 
-Установка переменных среды:
+**Установка переменных среды:**
 
     $ export USER_NAME=postgres
     $ export BASE_NAME=judyst_backend
@@ -51,21 +51,24 @@
     $ export BASE_URL=http://127.0.0.1:8000
     $ export BASE_PASSWORD=[secure]
 
-Запуск внешнекй инфраструктуры:
-- sudo systemctl postgresql start
-- sudo systemctl rabbitmq-server start
+**Запуск внешнекй инфраструктуры:**
 
-Генерация настроек:
+    sudo systemctl postgresql start
+    sudo systemctl rabbitmq-server start
+
+**Генерация настроек:**
 
 _Стоит отметить, что настройки генерируются из переменных среды._
-- python gen_settings.py
 
-Настройка базы данных:
+    python gen_settings.py
+
+**Настройка базы данных:**
 
 _Настройка производится на основе встроенных средств django._
-- manage.py makemigrations
-- manage.py migrate
-- manage.py createsuperuser
+
+    manage.py makemigrations
+    manage.py migrate
+    manage.py createsuperuser
 
 ## run
 После **pre run** можно инициализировать запуск проекта
