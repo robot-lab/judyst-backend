@@ -21,7 +21,7 @@
 Для установки: 
 - [Офциальная инструкция](https://www.rabbitmq.com/install-debian.html)
 - [Первая инструкция](https://www.saqot.com/working/rabbitmq-queue-bundle/setup-rabbitmq-ubuntu.html)
-- [Dnjhfz bycnherwbz](https://tecadmin.net/install-rabbitmq-server-debian/)
+- [Вторвая инструкция](https://tecadmin.net/install-rabbitmq-server-debian/)
 
 **postgresql**
 
