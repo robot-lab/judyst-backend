@@ -1,4 +1,4 @@
-
+![ER-database schema](https://user-images.githubusercontent.com/21951917/55228593-87fbac80-522b-11e9-8897-fa2bf2d6603f.jpg)
 
 ## Список таблиц
 
