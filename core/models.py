@@ -8,13 +8,13 @@ class DocumentSupertype(models.Model):
 
 
 class Owner(models.Model):
-    owner_key = models.IntegerField(primary_key=True)
+    pass
 
 
 class Document(models.Model):
     doc_id = models.CharField("id of document", max_length=45, unique=True)
     text = models.TextField("source of document")
-    type = models.ForeignKey(DocumentSupertype, on_delete=models.PROTECT)
+    doc_type = models.ForeignKey(DocumentSupertype, on_delete=models.PROTECT)
     owner = models.ForeignKey(Owner, on_delete=models.CASCADE)
     is_visible = models.BooleanField(default=True)
 
@@ -136,6 +136,6 @@ class Property(models.Model):
     text_value = models.CharField(max_length=45, blank=True)
     date_value = models.DateTimeField(blank=True)
     document = models.ForeignKey(Document, on_delete=models.CASCADE)
-    type = models.ForeignKey(PropertyType, on_delete=models.PROTECT)
+    property_type = models.ForeignKey(PropertyType, on_delete=models.PROTECT)
     analyze_source = models.OneToOneField(Analyze, on_delete=models.SET_NULL,
                                           null=True)
