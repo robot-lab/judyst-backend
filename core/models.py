@@ -52,7 +52,7 @@ class CustomUser(AbstractUser):
 
 
 class Organisation(models.Model):
-    name = models.CharField(max_length=150)
+    name = models.CharField(max_length=150, unique=True)
     registration_date = models.DateField(auto_now=True)
     is_activated = models.BooleanField(default=False)
     members = models.ManyToManyField(CustomUser, through='OrganisationUser',
@@ -80,6 +80,9 @@ class TextPosition(models.Model):
     length = models.IntegerField()
     document = models.ForeignKey(Document, on_delete=models.CASCADE)
 
+    class Meta:
+        unique_together = ('start_position', 'length', 'document')
+
 
 class Analyze(models.Model):
     time = models.DateTimeField(blank=True)
@@ -101,4 +104,38 @@ class Analyze(models.Model):
 
 class RawData(models.Model):
     text = models.TextField()
-    analyze_source = models.OneToOneField(Analyze, on_delete=models.SET_NULL)
+    analyze_source = models.OneToOneField(Analyze, on_delete=models.SET_NULL,
+                                          null=True)
+
+
+class Link(models.Model):
+    doc_from = models.ForeignKey(Document, on_delete=models.CASCADE)
+    doc_to = models.ForeignKey(Document, on_delete=models.CASCADE)
+    analyze_source = models.OneToOneField(Analyze, on_delete=models.SET_NULL,
+                                          null=True)
+    text_position = models.ManyToManyField(TextPosition,
+                                           through="LinkPosition",
+                                           through_fields=("link",
+                                                           "text_position"))
+
+
+class LinkPosition(models.Model):
+    link = models.ForeignKey(Link, on_delete=models.CASCADE)
+    text_position = models.ForeignKey(TextPosition, on_delete=models.CASCADE)
+
+    class Meta:
+        unique_together = ('text_position', 'link',)
+
+
+class PropertyType(models.Model):
+    name = models.CharField(max_length=45, unique=True)
+
+
+class Property(models.Model):
+    int_value = models.IntegerField(blank=True)
+    text_value = models.CharField(max_length=45, blank=True)
+    date_value = models.DateTimeField(blank=True)
+    document = models.ForeignKey(Document, on_delete=models.CASCADE)
+    type = models.ForeignKey(PropertyType, on_delete=models.PROTECT)
+    analyze_source = models.OneToOneField(Analyze, on_delete=models.SET_NULL,
+                                          null=True)
