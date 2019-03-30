@@ -41,9 +41,8 @@ class CustomUser(AbstractUser):
 
     @classmethod
     def create(cls, **kwargs):
-        if 'owner' in kwargs:
-            del kwargs['owner']
-        user = cls(owner=Owner.objects.create(), **kwargs)
+        kwargs['owner'] = Owner.objects.create()
+        user = cls(**kwargs)
         user.save()
         return user
 
@@ -60,9 +59,8 @@ class Organisation(models.Model):
 
     @classmethod
     def create(cls, **kwargs):
-        if 'owner' in kwargs:
-            del kwargs['owner']
-        org = cls(owner=Owner.objects.create(), **kwargs)
+        kwargs['owner'] = Owner.objects.create()
+        org = cls(**kwargs)
         org.save()
         return org
 
