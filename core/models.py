@@ -110,9 +110,9 @@ class RawData(models.Model):
 
 class Link(models.Model):
     doc_from = models.ForeignKey(Document, on_delete=models.CASCADE,
-                                 related_name="source of link")
+                                 related_name="source_of_link")
     doc_to = models.ForeignKey(Document, on_delete=models.CASCADE,
-                               related_name="link value")
+                               related_name="link_value")
     analyze_source = models.OneToOneField(Analyze, on_delete=models.SET_NULL,
                                           null=True)
     text_position = models.ManyToManyField(TextPosition,
