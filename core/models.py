@@ -1,5 +1,6 @@
 from django.contrib.auth.models import AbstractUser
 from django.db import models
+from django.core.exceptions import ValidationError
 
 
 class DocumentSupertype(models.Model):
@@ -72,3 +73,32 @@ class OrganisationUser(models.Model):
 
     class Meta:
         unique_together = ('organisation', 'user',)
+
+
+class TextPosition(models.Model):
+    start_position = models.IntegerField()
+    length = models.IntegerField()
+    document = models.ForeignKey(Document, on_delete=models.CASCADE)
+
+
+class Analyze(models.Model):
+    time = models.DateTimeField(blank=True)
+    analyzer = models.ForeignKey(Analyzer, on_delete=models.CASCADE)
+    user = models.ForeignKey(CustomUser, on_delete=models.CASCADE, blank=True)
+    text_position = models.ForeignKey(TextPosition, on_delete=models.PROTECT,
+                                      blank=True)
+    raw_data = models.ForeignKey("RawData", on_delete=models.PROTECT,
+                                 blank=True)
+
+    def clean(self):
+        super().clean()
+        if (self.text_position is None and self.raw_data is not None) or \
+                (self.text_position is not None and self.raw_data is None):
+            raise ValidationError(_('Validation error text'),
+                                  code="exactly one of raw data and tex "
+                                       "position must be null")
+
+
+class RawData(models.Model):
+    text = models.TextField()
+    analyze_source = models.OneToOneField(Analyze, on_delete=models.SET_NULL)
