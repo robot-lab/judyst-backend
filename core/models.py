@@ -8,7 +8,7 @@ class DocumentSupertype(models.Model):
 
 
 class Owner(models.Model):
-    pass
+    owner_key = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
 
 
 class Document(models.Model):
