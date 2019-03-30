@@ -6,7 +6,7 @@ class DocumentSupertype(models.Model):
 
 
 class Owner(models.Model):
-    pk = models.IntegerField(primary_key=True)
+    owner_key = models.IntegerField(primary_key=True)
 
 
 class Document(models.Model):
