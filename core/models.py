@@ -1,3 +1,5 @@
+import uuid
+
 from django.contrib.auth.models import AbstractUser
 from django.db import models
 from django.core.exceptions import ValidationError
@@ -8,7 +10,8 @@ class DocumentSupertype(models.Model):
 
 
 class Owner(models.Model):
-    owner_key = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    owner_key = models.UUIDField(primary_key=True, default=uuid.uuid4,
+                                 editable=False)
 
 
 class Document(models.Model):
@@ -37,7 +40,7 @@ class CustomUser(AbstractUser):
     first_name = models.CharField(max_length=255)
     last_name = models.CharField(max_length=255)
     is_activated = models.BooleanField(default=False)
-    owner = models.ForeignKey(Owner, on_delete=models.CASCADE)
+    owner = models.OneToOneField(Owner, on_delete=models.CASCADE)
 
     @classmethod
     def create(cls, **kwargs):
@@ -54,8 +57,8 @@ class Organisation(models.Model):
     name = models.CharField(max_length=150, unique=True)
     registration_date = models.DateField(auto_now=True)
     is_activated = models.BooleanField(default=False)
-    members = models.ManyToManyField(CustomUser, through='OrganisationUser',
-                                     through_fields=('organisation', 'user'))
+    members = models.ManyToManyField(CustomUser)
+    owner = models.OneToOneField(Owner, on_delete=models.CASCADE)
 
     @classmethod
     def create(cls, **kwargs):
@@ -63,14 +66,6 @@ class Organisation(models.Model):
         org = cls(**kwargs)
         org.save()
         return org
-
-
-class OrganisationUser(models.Model):
-    organisation = models.ForeignKey(Organisation, on_delete=models.CASCADE)
-    user = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
-
-    class Meta:
-        unique_together = ('organisation', 'user',)
 
 
 class TextPosition(models.Model):
@@ -113,18 +108,7 @@ class Link(models.Model):
                                related_name="link_value")
     analyze_source = models.OneToOneField(Analyze, on_delete=models.SET_NULL,
                                           null=True)
-    text_position = models.ManyToManyField(TextPosition,
-                                           through="LinkPosition",
-                                           through_fields=("link",
-                                                           "text_position"))
-
-
-class LinkPosition(models.Model):
-    link = models.ForeignKey(Link, on_delete=models.CASCADE)
-    text_position = models.ForeignKey(TextPosition, on_delete=models.CASCADE)
-
-    class Meta:
-        unique_together = ('text_position', 'link',)
+    text_position = models.ManyToManyField(TextPosition)
 
 
 class PropertyType(models.Model):
