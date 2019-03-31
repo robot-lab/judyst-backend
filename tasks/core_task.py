@@ -5,4 +5,9 @@ class AnalyzeTasksGeneration(BaseTask):
     pass
 
 
+class AddNewFile(BaseTask):
+    pass
+
+
 app.tasks.register(AnalyzeTasksGeneration())
+app.tasks.register(AddNewFile())
