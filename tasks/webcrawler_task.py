@@ -2,10 +2,12 @@ from tasks.basic_task import BaseTask, app
 
 
 class CheckTextSources(BaseTask):
+    # ToDo: here will be override functions: on_prerun, run, on_success
     pass
 
 
 class GetDocumentText(BaseTask):
+    # ToDo: here will be override functions: on_prerun, run, on_success
     pass
 
 
