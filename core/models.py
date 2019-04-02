@@ -39,7 +39,6 @@ class Analyzer(models.Model):
 class CustomUser(AbstractUser):
     first_name = models.CharField(max_length=255)
     last_name = models.CharField(max_length=255)
-    is_activated = models.BooleanField(default=False)
     owner = models.OneToOneField(Owner, on_delete=models.CASCADE)
 
     @classmethod
