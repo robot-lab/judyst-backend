@@ -146,6 +146,8 @@ USE_TZ = True
 
 STATIC_URL = '/static/'
 
+TEXT_FIELD_LENGTH = 200
+
 # All private settings
 try:
     from .local_settings import *

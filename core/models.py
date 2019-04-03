@@ -3,10 +3,12 @@ import uuid
 from django.contrib.auth.models import AbstractUser
 from django.db import models
 from django.core.exceptions import ValidationError
+from django.conf import settings
 
 
 class DocumentSupertype(models.Model):
-    name = models.CharField("name of supertype", max_length=45, unique=True)
+    name = models.CharField("name of supertype",
+                            max_length=settings.TEXT_FIELD_LENGTH, unique=True)
 
 
 class Owner(models.Model):
@@ -15,7 +17,9 @@ class Owner(models.Model):
 
 
 class Document(models.Model):
-    doc_id = models.CharField("id of document", max_length=45, unique=True)
+    doc_id = models.CharField("id of document",
+                              max_length=settings.TEXT_FIELD_LENGTH,
+                              unique=True)
     text = models.TextField("source of document")
     doc_type = models.ForeignKey(DocumentSupertype, on_delete=models.PROTECT)
     owner = models.ForeignKey(Owner, on_delete=models.CASCADE)
@@ -24,12 +28,13 @@ class Document(models.Model):
 
 class AnalyzerType(models.Model):
     name = models.CharField("name of analyze, which provide these analyzers",
-                            max_length=100, unique=True)
+                            max_length=settings.TEXT_FIELD_LENGTH, unique=True)
 
 
 class Analyzer(models.Model):
     version = models.IntegerField("version of current analyzer")
-    name = models.CharField("name of analyzer", max_length=100)
+    name = models.CharField("name of analyzer",
+                            max_length=settings.TEXT_FIELD_LENGTH)
     analyzer_type = models.ForeignKey(AnalyzerType, on_delete=models.PROTECT)
 
     class Meta:
@@ -37,8 +42,8 @@ class Analyzer(models.Model):
 
 
 class CustomUser(AbstractUser):
-    first_name = models.CharField(max_length=255)
-    last_name = models.CharField(max_length=255)
+    first_name = models.CharField(max_length=settings.TEXT_FIELD_LENGTH)
+    last_name = models.CharField(max_length=settings.TEXT_FIELD_LENGTH)
     owner = models.OneToOneField(Owner, on_delete=models.CASCADE)
 
     @classmethod
@@ -53,7 +58,7 @@ class CustomUser(AbstractUser):
 
 
 class Organisation(models.Model):
-    name = models.CharField(max_length=150, unique=True)
+    name = models.CharField(max_length=settings.TEXT_FIELD_LENGTH, unique=True)
     registration_date = models.DateField(auto_now=True)
     is_activated = models.BooleanField(default=False)
     members = models.ManyToManyField(CustomUser)
@@ -111,12 +116,13 @@ class Link(models.Model):
 
 
 class PropertyType(models.Model):
-    name = models.CharField(max_length=45, unique=True)
+    name = models.CharField(max_length=settings.TEXT_FIELD_LENGTH, unique=True)
 
 
 class Property(models.Model):
     int_value = models.IntegerField(blank=True)
-    text_value = models.CharField(max_length=45, blank=True)
+    text_value = models.CharField(max_length=settings.TEXT_FIELD_LENGTH,
+                                  blank=True)
     date_value = models.DateTimeField(blank=True)
     document = models.ForeignKey(Document, on_delete=models.CASCADE)
     property_type = models.ForeignKey(PropertyType, on_delete=models.PROTECT)
@@ -126,4 +132,4 @@ class Property(models.Model):
 
 class DataSource(models.Model):
     source_link = models.URLField()
-    crawler_name = models.CharField(max_length=150)
+    crawler_name = models.CharField(max_length=settings.TEXT_FIELD_LENGTH)
