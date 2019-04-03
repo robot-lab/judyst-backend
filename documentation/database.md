@@ -1,6 +1,6 @@
 ## ER схема[[source](https://drive.google.com/file/d/1HfWG88q3jd5QXCMTtcQ_LGCancWn91yU/view)]
 
-![ER-database schema](https://user-images.githubusercontent.com/21951917/55478417-5ff1bc00-5624-11e9-9f3e-882cb5cf50ae.jpg)
+![ER-database schema](https://user-images.githubusercontent.com/21951917/55478985-b14e7b00-5625-11e9-9c0d-5484aeee3a5f.jpg)
 
 ## Список таблиц
 

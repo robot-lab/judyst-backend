@@ -122,3 +122,8 @@ class Property(models.Model):
     property_type = models.ForeignKey(PropertyType, on_delete=models.PROTECT)
     analyze_source = models.OneToOneField(Analyze, on_delete=models.SET_NULL,
                                           null=True)
+
+
+class DataSource(models.Model):
+    source_link = models.URLField()
+    crawler_name = models.CharField(max_length=150)
