@@ -1,11 +1,29 @@
 import os
 
 
-def good_view(variable_name):
+def good_view(variable_name: str) -> str:
+    """
+    Function for make pretty names of environmental variables.
+
+    :param variable_name: str
+        name of env variable.
+
+    :return: str
+        pretty view.
+    """
     return variable_name.lower().replace('_', ' ')
 
 
 def get_var(key: str) -> str:
+    """
+    Function for getting variable value from environment.
+
+    :param key: str
+        variable name.
+
+    :return: str
+        variable value.
+    """
     result = os.environ.get(key)
     if result is None:
         print(f'In your environment no {key} find.')
