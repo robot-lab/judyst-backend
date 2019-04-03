@@ -1,10 +1,15 @@
 import os
 
 
+def good_view(variable_name):
+    return variable_name.lower().replace('_', ' ')
+
+
 def get_var(key: str) -> str:
     result = os.environ.get(key)
     if result is None:
-        return key
+        print(f'In your environment no {key} find.')
+        return input(f'Please enter {good_view(key)}: ')
     else:
         return result
 
