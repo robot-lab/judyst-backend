@@ -1,4 +1,6 @@
-![ER-database schema](https://user-images.githubusercontent.com/21951917/55388052-3a3cb800-553b-11e9-9dc0-40eb60e0a7a1.jpg)
+## ER схема[[source](https://drive.google.com/file/d/1HfWG88q3jd5QXCMTtcQ_LGCancWn91yU/view)]
+
+![ER-database schema](https://user-images.githubusercontent.com/21951917/55478417-5ff1bc00-5624-11e9-9f3e-882cb5cf50ae.jpg)
 
 ## Список таблиц
 
@@ -95,3 +97,8 @@
 
 **DocumentOwner** - Отношение владельца документа
 1. **owner_key** - первичный ключ
+
+**DataSource** - Таблица со списком источников документ для периодического сканирования
+1. **id** - первичный ключ
+2. **source_link** - Ссылка на электронный ресурс с документами для обработки
+3. **crawler_name** - Имя crawler который предназначен для сканирования этого ресурса
