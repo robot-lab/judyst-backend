@@ -114,6 +114,8 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
+AUTH_USER_MODEL = 'core.CustomUser'
+
 #celery init
 
 BROKER_URL = None
