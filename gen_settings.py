@@ -6,6 +6,7 @@ import argparse
 
 auto_gen_len = 17
 keys_for_auto_gen = []
+allow_input = False
 
 
 def good_view(variable_name: str) -> str:
@@ -45,7 +46,8 @@ def get_var(key: str) -> str:
     result = os.environ.get(key)
     if result is None:
         print(f'In your environment no {key} find.')
-        return input(f'Please enter {good_view(key)}: ')
+        if allow_input:
+            return input(f'Please enter {good_view(key)}: ')
     else:
         return result
 
@@ -89,7 +91,9 @@ if __name__=="__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument('-ag', '--auto_generation', nargs='+', default=[], type=str)
     parser.add_argument('-l', '--len', default=17, type=int)
+    parser.add_argument('-i', '--input', default=False, type=bool)
     namespace = parser.parse_args(sys.argv[1:])
     auto_gen_len = namespace.len
     keys_for_auto_gen = namespace.auto_generation
+    allow_input = namespace.input
     print_template()
