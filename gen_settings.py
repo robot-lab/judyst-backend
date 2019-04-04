@@ -1,16 +1,65 @@
+import sys
 import os
+import random
+import string
+import argparse
+
+auto_gen_len = 17
+keys_for_auto_gen = []
+allow_input = False
+
+
+def good_view(variable_name: str) -> str:
+    """
+    Function for make pretty names of environmental variables.
+
+    :param variable_name: str
+        name of env variable.
+
+    :return: str
+        pretty view.
+    """
+    return variable_name.lower().replace('_', ' ')
+
+
+def rnd_gen() -> str:
+    """
+    function for generating random strings
+    :return: string
+        random string fixed length
+    """
+    return ''.join(random.choice(string.digits + string.ascii_letters) for _ in range(auto_gen_len))
 
 
 def get_var(key: str) -> str:
+    """
+    Function for getting variable value from environment.
+
+    :param key: str
+        variable name.
+
+    :return: str
+        variable value.
+    """
+    if key in keys_for_auto_gen:
+        return rnd_gen()
     result = os.environ.get(key)
     if result is None:
-        return key
+        print(f'In your environment no {key} find.')
+        if allow_input:
+            return input(f'Please enter {good_view(key)}: ')
     else:
         return result
 
 
-with open("./judyst_backend/local_settings.py", 'w') as f:
-    f.write(f"""
+def print_template():
+    """
+    function for printing template to the local_settings.py file
+
+    :return: None
+    """
+    with open("./judyst_backend/local_settings.py", 'w') as f:
+        f.write(f"""
 # debug flag
 DEBUG = True
 
@@ -36,3 +85,15 @@ ALLOWED_HOSTS = ['*']
 # security information
 SECRET_KEY = "{get_var("SECRET_KEY")}"
 """)
+
+
+if __name__=="__main__":
+    parser = argparse.ArgumentParser()
+    parser.add_argument('-ag', '--auto_generation', nargs='+', default=[], type=str)
+    parser.add_argument('-l', '--len', default=17, type=int)
+    parser.add_argument('-i', '--input', default=False, type=bool)
+    namespace = parser.parse_args(sys.argv[1:])
+    auto_gen_len = namespace.len
+    keys_for_auto_gen = namespace.auto_generation
+    allow_input = namespace.input
+    print_template()
