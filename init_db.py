@@ -1,5 +1,6 @@
 import subprocess
 import os
+import json
 
 
 names_for_check = ['python3.6', 'python3', 'python']
@@ -34,25 +35,8 @@ if __name__ == '__main__':
     from core.models import DocumentSupertype, AnalyzerType, Analyzer, \
         PropertyType, DataSource, Organisation
 
-    conf = {
-        'DocumentSupertype': ['KSRF-solution', 'codecs'],
-        'AnalyzerType': ['LinkScanner'],
-        'Analyzer': [
-            {
-                'name': 'oleg-RE-links',
-                'version': 1,
-                'type': 'LinkScanner'
-            }
-        ],
-        'PropertyType': ['source'],
-        'DataSource': [
-            {
-                'link': 'http://www.ksrf.ru/ru/Decision/Pages/default.aspx',
-                'name': 'KSRF-crawler'
-            }
-        ],
-        'Organisation': 'Judyst'
-    }
+    with open('init_db_conf.json') as f_in:
+        conf = json.load(f_in)
 
     for name in conf['DocumentSupertype']:
         DocumentSupertype.objects.create(name=name)
