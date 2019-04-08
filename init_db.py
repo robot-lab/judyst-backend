@@ -1,25 +1,8 @@
 import subprocess
 import os
 import json
-
-
-names_for_check = ['python3.6', 'python3', 'python']
-
-
-def get_python_name():
-    """
-    Function for getting name of python in system.
-
-    :return:
-        Name of python installed in system
-    """
-    for name in names_for_check:
-        try:
-            subprocess.run([name, '-c', 'exit()'])
-            return name
-        except FileNotFoundError:
-            pass
-    raise FileNotFoundError
+import argparse
+import sys
 
 
 if __name__ == '__main__':
@@ -27,8 +10,11 @@ if __name__ == '__main__':
     import django
     django.setup()
 
-    executor = get_python_name()
-    print(executor, 'used for generation')
+    parser = argparse.ArgumentParser()
+    parser.add_argument('-pn', '--python_name', default='python3.6', type=str)
+    namespace = parser.parse_args(sys.argv[1:])
+    executor = namespace.python_name
+
     subprocess.run([executor, 'manage.py', 'makemigrations'])
     subprocess.run([executor, 'manage.py', 'migrate'])
 
@@ -39,22 +25,24 @@ if __name__ == '__main__':
         conf = json.load(f_in)
 
     for name in conf['DocumentSupertype']:
-        DocumentSupertype.objects.create(name=name)
+        DocumentSupertype.objects.get_or_create(name=name)
         print('created', 'DocumentSupertype', name)
     for name in conf['AnalyzerType']:
-        AnalyzerType.objects.create(name=name)
+        AnalyzerType.objects.get_or_create(name=name)
         print('created', 'AnalyzerType', name)
     for name in conf['PropertyType']:
-        PropertyType.objects.create(name=name)
+        PropertyType.objects.get_or_create(name=name)
         print('created', 'PropertyType', name)
-    Organisation.create(name=conf['Organisation'], is_activated=True)
+    if not Organisation.objects.filter(name=conf['Organisation']).exists():
+        Organisation.create(name=conf['Organisation'], is_activated=True)
     print('created', 'Organisation', conf['Organisation'])
     for elem in conf['DataSource']:
-        DataSource.objects.create(crawler_name=elem['name'],
-                                  source_link=elem['link'])
+        DataSource.objects.get_or_create(crawler_name=elem['name'],
+                                         source_link=elem['link'])
         print('created', 'DataSource', elem)
     for elem in conf['Analyzer']:
-        t = AnalyzerType.objects.get(name=elem['type'])
-        Analyzer.objects.create(name=elem['name'], version=elem['version'],
-                                analyzer_type=t)
+        analyzer_type = AnalyzerType.objects.get(name=elem['type'])
+        Analyzer.objects.get_or_create(name=elem['name'],
+                                       version=elem['version'],
+                                       analyzer_type=analyzer_type)
         print('created', 'Analyzer', elem)
