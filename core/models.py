@@ -10,6 +10,9 @@ class DocumentSupertype(models.Model):
     name = models.CharField("name of supertype",
                             max_length=settings.TEXT_FIELD_LENGTH, unique=True)
 
+    def __str__(self):
+        return f'DocumentSupertype(name={self.name})'
+
 
 class Owner(models.Model):
     owner_key = models.UUIDField(primary_key=True, default=uuid.uuid4,
@@ -25,10 +28,16 @@ class Document(models.Model):
     owner = models.ForeignKey(Owner, on_delete=models.CASCADE)
     is_visible = models.BooleanField(default=True)
 
+    def __str__(self):
+        return f'Document(doc_id={self.doc_id})'
+
 
 class AnalyzerType(models.Model):
     name = models.CharField("name of analyze, which provide these analyzers",
                             max_length=settings.TEXT_FIELD_LENGTH, unique=True)
+
+    def __str__(self):
+        return f'AnalyzerType(name={self.name})'
 
 
 class Analyzer(models.Model):
@@ -36,6 +45,9 @@ class Analyzer(models.Model):
     name = models.CharField("name of analyzer",
                             max_length=settings.TEXT_FIELD_LENGTH)
     analyzer_type = models.ForeignKey(AnalyzerType, on_delete=models.PROTECT)
+
+    def __str__(self):
+        return f'Analyzer(name={self.name},version={self.version})'
 
     class Meta:
         unique_together = ('version', 'name',)
@@ -54,7 +66,7 @@ class CustomUser(AbstractUser):
         return user
 
     def __str__(self):
-        return self.email
+        return f'CustomUser(email={self.email})'
 
 
 class Organisation(models.Model):
@@ -63,6 +75,9 @@ class Organisation(models.Model):
     is_activated = models.BooleanField(default=False)
     members = models.ManyToManyField(CustomUser)
     owner = models.OneToOneField(Owner, on_delete=models.CASCADE)
+
+    def __str__(self):
+        return f'Organisation(name={self.name})'
 
     @classmethod
     def create(cls, **kwargs):
@@ -118,6 +133,9 @@ class Link(models.Model):
 class PropertyType(models.Model):
     name = models.CharField(max_length=settings.TEXT_FIELD_LENGTH, unique=True)
 
+    def __str__(self):
+        return f'PropertyType(name={self.name})'
+
 
 class Property(models.Model):
     int_value = models.IntegerField(blank=True)
@@ -133,3 +151,7 @@ class Property(models.Model):
 class DataSource(models.Model):
     source_link = models.URLField()
     crawler_name = models.CharField(max_length=settings.TEXT_FIELD_LENGTH)
+
+    def __str__(self):
+        return f'DataSource(source_link={self.source_link},' \
+            f'crawler_name={self.crawler_name})'
