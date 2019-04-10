@@ -3,6 +3,7 @@ import os
 import json
 import argparse
 import sys
+import trafaret as t
 
 
 def loud_model_creation(model, params: dict, show=False) -> None:
@@ -16,7 +17,7 @@ def loud_model_creation(model, params: dict, show=False) -> None:
         Dictionary with params for model.
 
     :param show: bool
-        Flag to show verbose information
+        Flag to show verbose information.
     """
     m, created = model.objects.get_or_create(**params)
     if show:
@@ -37,34 +38,57 @@ def generate_object_by_name(model, l: list, show=False) -> None:
         List with names for creation.
 
     :param show: bool
-        Flag to show verbose information
+        Flag to show verbose information.
     """
     for element in l:
         loud_model_creation(model, {'name': element}, show=show)
 
 
-def check_fields(old_dict:dict, fields: list)->(None, dict):
+def create_organisation(name: str, show=False) -> None:
     """
-    Function for making copy of dict with needed fields or return None if not
-    all fields represented.
+    Function for checking if organisation with given name exist and if not
+    create it.
 
-    :param old_dict: dict
-        Dictionary with presented fields.
+    :param name: str
+        Name of organisation.
 
-    :param fields: list
-        Fields for checking
-
-    :return: (None, dict)
-        Return dict if all fields presented or None otherwise.
+    :param show: bool
+        Flag to show verbose information.
     """
-    res = {}
-    for field_name in fields:
-        if field_name not in old_dict:
-            print(f'error no field {field_name} in {old_dict}')
-            return
+    created = False
+    try:
+        model = Organisation.objects.get(name=name)
+    except ObjectDoesNotExist:
+        model = Organisation.create(name=name, is_activated=True)
+        created = True
+    if show:
+        if created:
+            print(f'created {model}')
         else:
-            res[field_name] = old_dict[field_name]
-    return res
+            print(f'exist {model}')
+
+
+def create_analyzer(params: dict, show=False) -> None:
+    """
+    Function for checking if analyzer with given params exist and if not
+    create it.
+
+    :param params: dict
+        Name of organisation.
+
+    :param show: bool
+        Flag to show verbose information.
+    """
+    model_params = params.copy()
+
+    try:
+        model_params['analyzer_type'] = AnalyzerType.objects.get(
+            name=params['analyzer_type'])
+    except ObjectDoesNotExist:
+        print(f"error analyzer type: {params['analyzer_type']} not presented"
+              f" in data base")
+        return
+    loud_model_creation(Analyzer, model_params, show=show)
 
 
 if __name__ == '__main__':
@@ -98,50 +122,37 @@ if __name__ == '__main__':
         print(f'file {file_name} is not correct json')
         exit(-2)
 
-    if 'DocumentSupertype' in conf and isinstance(conf['DocumentSupertype'],
-                                                  list):
-        generate_object_by_name(DocumentSupertype,
-                                conf['DocumentSupertype'], show=verbose)
-    if 'AnalyzerType' in conf and isinstance(conf['AnalyzerType'], list):
-        generate_object_by_name(AnalyzerType,
-                                conf['AnalyzerType'], show=verbose)
-    if 'PropertyType' in conf and isinstance(conf['PropertyType'], list):
-        generate_object_by_name(PropertyType,
-                                conf['PropertyType'], show=verbose)
+    checker = t.Dict({
+        t.Key('DocumentSupertype'): t.List(t.String),
+        t.Key('AnalyzerType'): t.List(t.String),
+        t.Key('PropertyType'): t.List(t.String),
+        t.Key('Organisation', optional=True): t.String,
+        t.Key('DataSource'): t.List(t.Dict({
+            t.Key('crawler_name'): t.String,
+            t.Key('source_link'): t.URL
+        })),
+        t.Key('Analyzer'): t.List(t.Dict({
+            t.Key('name'): t.String,
+            t.Key('version'): t.Int,
+            t.Key('analyzer_type'): t.String
+        }))
+    })
+
+    try:
+        conf = checker.check(conf)
+    except t.DataError:
+        print(t.extract_error(checker, conf))
+        exit(-3)
+
+    generate_object_by_name(DocumentSupertype, conf['DocumentSupertype'],
+                            show=verbose)
+    generate_object_by_name(AnalyzerType, conf['AnalyzerType'], show=verbose)
+    generate_object_by_name(PropertyType, conf['PropertyType'], show=verbose)
+
     if 'Organisation' in conf:
-        created = False
-        m = None
-        try:
-            m = Organisation.objects.get(name=conf['Organisation'])
-        except ObjectDoesNotExist:
-            m = Organisation.create(name=conf['Organisation'],
-                                    is_activated=True)
-            created = True
-        if verbose:
-            if created:
-                print(f'created {m}')
-            else:
-                print(f'exist {m}')
+        create_organisation(conf['Organisation'], show=verbose)
 
-    if 'DataSource' in conf and isinstance(conf['DataSource'], list):
-        for elem in conf['DataSource']:
-            d = check_fields(elem, ['crawler_name', 'source_link'])
-            if d:
-                loud_model_creation(DataSource, d, show=verbose)
-    if 'Analyzer' in conf and isinstance(conf['Analyzer'], list):
-        for elem in conf['Analyzer']:
-            d = check_fields(elem, ['name', 'version'])
-
-            if 'analyzer_type' not in elem:
-                print(f'error no analyzer type in {elem}')
-                continue
-
-            try:
-                analyzer_type = AnalyzerType.objects.get(
-                    name=elem['analyzer_type'])
-            except ObjectDoesNotExist:
-                print(f"error analyzer type: {elem['analyzer_type']} "
-                      f"not presented in data base")
-                continue
-            d['analyzer_type'] = analyzer_type
-            loud_model_creation(Analyzer, d, show=verbose)
+    for elem in conf['DataSource']:
+        loud_model_creation(DataSource, elem, show=verbose)
+    for elem in conf['Analyzer']:
+        create_analyzer(elem, show=verbose)
