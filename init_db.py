@@ -108,10 +108,20 @@ if __name__ == '__main__':
     if 'PropertyType' in conf and isinstance(conf['PropertyType'], list):
         generate_object_by_name(PropertyType,
                                 conf['PropertyType'], show=verbose)
-    if 'Organisation' in conf and not \
-            Organisation.objects.filter(name=conf['Organisation']).exists():
-        loud_model_creation(Organisation, {'name': conf['Organisation'],
-                             'is_activated': True}, show=verbose)
+    if 'Organisation' in conf:
+        created = False
+        m = None
+        try:
+            m = Organisation.objects.get(name=conf['Organisation'])
+        except ObjectDoesNotExist:
+            m = Organisation.create(name=conf['Organisation'],
+                                    is_activated=True)
+            created = True
+        if verbose:
+            if created:
+                print(f'created {m}')
+            else:
+                print(f'exist {m}')
 
     if 'DataSource' in conf and isinstance(conf['DataSource'], list):
         for elem in conf['DataSource']:
