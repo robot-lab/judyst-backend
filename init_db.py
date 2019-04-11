@@ -4,6 +4,13 @@ import json
 import argparse
 import sys
 import trafaret as t
+from enum import IntEnum
+
+
+class ErrorCodes(IntEnum):
+    NO_SUCH_FILE = -1
+    NOT_A_JSON_FILE = -2
+    NOT_CORRECT_JSON_STRUCTURE = -3
 
 
 def loud_model_creation(model, params: dict, show=False) -> None:
@@ -117,10 +124,10 @@ if __name__ == '__main__':
             conf = json.load(f_in)
     except FileNotFoundError:
         print(f"file {file_name} not found")
-        exit(-1)
+        exit(ErrorCodes.NO_SUCH_FILE)
     except json.decoder.JSONDecodeError:
         print(f'file {file_name} is not correct json')
-        exit(-2)
+        exit(ErrorCodes.NOT_A_JSON_FILE)
 
     checker = t.Dict({
         t.Key('DocumentSupertype'): t.List(t.String),
@@ -142,7 +149,7 @@ if __name__ == '__main__':
         conf = checker.check(conf)
     except t.DataError:
         print(t.extract_error(checker, conf))
-        exit(-3)
+        exit(ErrorCodes.NOT_CORRECT_JSON_STRUCTURE)
 
     generate_object_by_name(DocumentSupertype, conf['DocumentSupertype'],
                             show=verbose)
