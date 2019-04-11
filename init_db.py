@@ -143,14 +143,17 @@ def create_superuser(input_fields=False) -> None:
         return
 
     try:
-        user = CustomUser.objects.filter(username=username).get()
+        user = CustomUser.objects.get(username=username)
         if not user.is_staff:
             print(f'user {username} exists and it is not staff')
             return
         if not user.is_superuser:
             print(f'user {username} exists but not a superuser')
+            return
+        print(f'superuser {username} already exists')
     except CustomUser.DoesNotExist:
         CustomUser.objects.create_superuser(username, email, password)
+        print(f'superuser {username} created')
 
 
 if __name__ == '__main__':
