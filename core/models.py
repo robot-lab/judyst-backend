@@ -47,14 +47,14 @@ class Analyzer(models.Model):
     analyzer_type = models.ForeignKey(AnalyzerType, on_delete=models.PROTECT)
 
     def __str__(self):
-        return f'Analyzer(name={self.name},version={self.version})'
+        return f'Analyzer(name={self.name}, version={self.version})'
 
     class Meta:
         unique_together = ('version', 'name',)
 
 
 class CustomUserManager(UserManager):
-
+    # Manager for overriding basic create method and add owner_id to it.
     def _create_user(self, username, email, password, **extra_fields):
         extra_fields['owner'] = Owner.objects.create()
         return super()._create_user(username, email, password, **extra_fields)
@@ -72,14 +72,14 @@ class CustomUser(AbstractUser):
 
 
 class OrganisationQuerySet(models.query.QuerySet):
-
+    # QuerySet for overriding basic create method and add owner_id to it.
     def create(self, **kwargs):
         kwargs['owner'] = Owner.objects.create()
         return super().create(**kwargs)
 
 
 class OrganisationManager(models.Manager):
-
+    # Manager for changing used query set.
     def get_queryset(self):
         return OrganisationQuerySet(self.model)
 
@@ -163,5 +163,5 @@ class DataSource(models.Model):
     crawler_name = models.CharField(max_length=settings.TEXT_FIELD_LENGTH)
 
     def __str__(self):
-        return f'DataSource(source_link={self.source_link},' \
+        return f'DataSource(source_link={self.source_link}, ' \
             f'crawler_name={self.crawler_name})'
