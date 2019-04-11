@@ -1,6 +1,6 @@
 import uuid
 
-from django.contrib.auth.models import AbstractUser
+from django.contrib.auth.models import AbstractUser, UserManager
 from django.db import models
 from django.core.exceptions import ValidationError
 from django.conf import settings
@@ -53,20 +53,29 @@ class Analyzer(models.Model):
         unique_together = ('version', 'name',)
 
 
+class CustomUserManager(UserManager):
+
+    def _create_user(self, username, email, password, **extra_fields):
+        extra_fields['owner'] = Owner.objects.create()
+        return super()._create_user(username, email, password, **extra_fields)
+
+
 class CustomUser(AbstractUser):
     first_name = models.CharField(max_length=settings.TEXT_FIELD_LENGTH)
     last_name = models.CharField(max_length=settings.TEXT_FIELD_LENGTH)
     owner = models.OneToOneField(Owner, on_delete=models.CASCADE)
 
-    @classmethod
-    def create(cls, **kwargs):
-        kwargs['owner'] = Owner.objects.create()
-        user = cls(**kwargs)
-        user.save()
-        return user
-
     def __str__(self):
         return f'CustomUser(email={self.email})'
+
+    objects = CustomUserManager()
+
+
+class OrganisationManager(models.Manager):
+
+    def create(self, **kwargs):
+        kwargs['owner'] = Owner.objects.create()
+        return super().create(**kwargs)
 
 
 class Organisation(models.Model):
@@ -79,12 +88,7 @@ class Organisation(models.Model):
     def __str__(self):
         return f'Organisation(name={self.name})'
 
-    @classmethod
-    def create(cls, **kwargs):
-        kwargs['owner'] = Owner.objects.create()
-        org = cls(**kwargs)
-        org.save()
-        return org
+    objects = OrganisationManager()
 
 
 class TextPosition(models.Model):

@@ -51,30 +51,6 @@ def generate_object_by_name(model, l: list, show=False) -> None:
         loud_model_creation(model, {'name': element}, show=show)
 
 
-def create_organisation(name: str, show=False) -> None:
-    """
-    Function for checking if organisation with given name exist and if not
-    create it.
-
-    :param name: str
-        Name of organisation.
-
-    :param show: bool
-        Flag to show verbose information.
-    """
-    created = False
-    try:
-        model = Organisation.objects.get(name=name)
-    except ObjectDoesNotExist:
-        model = Organisation.create(name=name, is_activated=True)
-        created = True
-    if show:
-        if created:
-            print(f'created {model}')
-        else:
-            print(f'exist {model}')
-
-
 def create_analyzer(params: dict, show=False) -> None:
     """
     Function for checking if analyzer with given params exist and if not
@@ -157,7 +133,8 @@ if __name__ == '__main__':
     generate_object_by_name(PropertyType, conf['PropertyType'], show=verbose)
 
     if 'Organisation' in conf:
-        create_organisation(conf['Organisation'], show=verbose)
+        loud_model_creation(Organisation, {'name': conf['Organisation'],
+                                           'is_activated': True}, show=verbose)
 
     for elem in conf['DataSource']:
         loud_model_creation(DataSource, elem, show=verbose)
