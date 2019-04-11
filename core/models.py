@@ -71,11 +71,17 @@ class CustomUser(AbstractUser):
     objects = CustomUserManager()
 
 
-class OrganisationManager(models.Manager):
+class OrganisationQuerySet(models.query.QuerySet):
 
     def create(self, **kwargs):
         kwargs['owner'] = Owner.objects.create()
         return super().create(**kwargs)
+
+
+class OrganisationManager(models.Manager):
+
+    def get_queryset(self):
+        return OrganisationQuerySet(self.model)
 
 
 class Organisation(models.Model):
