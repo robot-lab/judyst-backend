@@ -160,11 +160,19 @@ if __name__ == '__main__':
     django.setup()
 
     parser = argparse.ArgumentParser()
-    parser.add_argument('-pn', '--python_name', default='python3.6', type=str)
-    parser.add_argument('-f', '--file', default='init_db_conf.json', type=str)
-    parser.add_argument('-v', '--verbose', action='store_true')
-    parser.add_argument('-su', '--super_user', action='store_true')
-    parser.add_argument('-i', '--input', action='store_true')
+    parser.add_argument('-pn', '--python_name', default='python3.6', type=str,
+                        help='python name for execute django preparation '
+                             'scripts')
+    parser.add_argument('-f', '--file', default='init_db_conf.json', type=str,
+                        help='file with data for inserting to database')
+    parser.add_argument('-v', '--verbose', action='store_true',
+                        help='flag for showing information about data '
+                             'inserting')
+    parser.add_argument('-su', '--super_user', action='store_true',
+                        help='flag if superuser should be created')
+    parser.add_argument('-i', '--input', action='store_true',
+                        help='flag if superuser fields may be inputted from '
+                             'keyboard')
     namespace = parser.parse_args(sys.argv[1:])
     executor = namespace.python_name
     file_name = namespace.file
