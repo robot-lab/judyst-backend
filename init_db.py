@@ -142,15 +142,14 @@ def create_superuser(input_fields=False) -> None:
         print('password mismatch')
         return
 
-    if CustomUser.objects.filter(username=username).exists():
+    try:
         user = CustomUser.objects.filter(username=username).get()
         if not user.is_staff:
             print(f'user {username} exists and it is not staff')
             return
         if not user.is_superuser:
             print(f'user {username} exists but not a superuser')
-            return
-    else:
+    except CustomUser.DoesNotExist:
         CustomUser.objects.create_superuser(username, email, password)
 
 
