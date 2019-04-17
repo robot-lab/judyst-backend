@@ -1,0 +1,19 @@
+{
+  "DocumentSupertype": ["KSRF-solution", "codecs"],
+  "AnalyzerType": ["LinkScanner"],
+  "Analyzer": [
+    {
+      "name": "oleg-RE-links",
+      "version": 1,
+      "analyzer_type": "LinkScanner"
+    }
+  ],
+  "PropertyType": ["source"],
+  "DataSource": [
+    {
+      "source_link": "http://www.ksrf.ru/ru/Decision/Pages/default.aspx",
+      "crawler_name": "KSRF-crawler"
+    }
+  ],
+  "Organisation": "Judyst"
+}

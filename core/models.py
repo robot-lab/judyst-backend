@@ -1,6 +1,6 @@
 import uuid
 
-from django.contrib.auth.models import AbstractUser
+from django.contrib.auth.models import AbstractUser, UserManager
 from django.db import models
 from django.core.exceptions import ValidationError
 from django.conf import settings
@@ -9,6 +9,9 @@ from django.conf import settings
 class DocumentSupertype(models.Model):
     name = models.CharField("name of supertype",
                             max_length=settings.TEXT_FIELD_LENGTH, unique=True)
+
+    def __str__(self):
+        return f'DocumentSupertype(name={self.name})'
 
 
 class Owner(models.Model):
@@ -25,10 +28,16 @@ class Document(models.Model):
     owner = models.ForeignKey(Owner, on_delete=models.CASCADE)
     is_visible = models.BooleanField(default=True)
 
+    def __str__(self):
+        return f'Document(doc_id={self.doc_id})'
+
 
 class AnalyzerType(models.Model):
     name = models.CharField("name of analyze, which provide these analyzers",
                             max_length=settings.TEXT_FIELD_LENGTH, unique=True)
+
+    def __str__(self):
+        return f'AnalyzerType(name={self.name})'
 
 
 class Analyzer(models.Model):
@@ -37,8 +46,18 @@ class Analyzer(models.Model):
                             max_length=settings.TEXT_FIELD_LENGTH)
     analyzer_type = models.ForeignKey(AnalyzerType, on_delete=models.PROTECT)
 
+    def __str__(self):
+        return f'Analyzer(name={self.name}, version={self.version})'
+
     class Meta:
         unique_together = ('version', 'name',)
+
+
+class CustomUserManager(UserManager):
+    # Manager for overriding basic create method and add owner_id to it.
+    def _create_user(self, username, email, password, **extra_fields):
+        extra_fields['owner'] = Owner.objects.create()
+        return super()._create_user(username, email, password, **extra_fields)
 
 
 class CustomUser(AbstractUser):
@@ -46,15 +65,23 @@ class CustomUser(AbstractUser):
     last_name = models.CharField(max_length=settings.TEXT_FIELD_LENGTH)
     owner = models.OneToOneField(Owner, on_delete=models.CASCADE)
 
-    @classmethod
-    def create(cls, **kwargs):
-        kwargs['owner'] = Owner.objects.create()
-        user = cls(**kwargs)
-        user.save()
-        return user
-
     def __str__(self):
-        return self.email
+        return f'CustomUser(email={self.email})'
+
+    objects = CustomUserManager()
+
+
+class OrganisationQuerySet(models.query.QuerySet):
+    # QuerySet for overriding basic create method and add owner_id to it.
+    def create(self, **kwargs):
+        kwargs['owner'] = Owner.objects.create()
+        return super().create(**kwargs)
+
+
+class OrganisationManager(models.Manager):
+    # Manager for changing used query set.
+    def get_queryset(self):
+        return OrganisationQuerySet(self.model)
 
 
 class Organisation(models.Model):
@@ -64,12 +91,10 @@ class Organisation(models.Model):
     members = models.ManyToManyField(CustomUser)
     owner = models.OneToOneField(Owner, on_delete=models.CASCADE)
 
-    @classmethod
-    def create(cls, **kwargs):
-        kwargs['owner'] = Owner.objects.create()
-        org = cls(**kwargs)
-        org.save()
-        return org
+    def __str__(self):
+        return f'Organisation(name={self.name})'
+
+    objects = OrganisationManager()
 
 
 class TextPosition(models.Model):
@@ -118,6 +143,9 @@ class Link(models.Model):
 class PropertyType(models.Model):
     name = models.CharField(max_length=settings.TEXT_FIELD_LENGTH, unique=True)
 
+    def __str__(self):
+        return f'PropertyType(name={self.name})'
+
 
 class Property(models.Model):
     int_value = models.IntegerField(blank=True)
@@ -133,3 +161,7 @@ class Property(models.Model):
 class DataSource(models.Model):
     source_link = models.URLField()
     crawler_name = models.CharField(max_length=settings.TEXT_FIELD_LENGTH)
+
+    def __str__(self):
+        return f'DataSource(source_link={self.source_link}, ' \
+            f'crawler_name={self.crawler_name})'

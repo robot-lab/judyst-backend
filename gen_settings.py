@@ -28,7 +28,8 @@ def rnd_gen() -> str:
     :return: string
         random string fixed length
     """
-    return ''.join(random.choice(string.digits + string.ascii_letters) for _ in range(auto_gen_len))
+    return ''.join(random.choice(string.digits + string.ascii_letters)
+                   for _ in range(auto_gen_len))
 
 
 def get_var(key: str) -> str:
